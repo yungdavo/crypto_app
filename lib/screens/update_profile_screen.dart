@@ -8,7 +8,7 @@ class UpdateProfileScreen extends StatelessWidget {
 
    final TextEditingController username = TextEditingController(); // to accept the username
    final TextEditingController email = TextEditingController();// to accept email
-   final TextEditingController age = TextEditingController();
+   //final TextEditingController age = TextEditingController();
    //function to save user details passed to the update button
 
    bool isDarkModeEnabled = AppTheme.isDarkModeEnabled;
@@ -20,7 +20,7 @@ class UpdateProfileScreen extends StatelessWidget {
    void saveUserDetails() async {
       await saveDetails('username', username.text); //the '.text' shows the details we have entered
       await saveDetails('email', email.text);
-      await saveDetails('age', age.text);
+      //await saveDetails('age', age.text);
    }
 
   @override
@@ -55,10 +55,9 @@ class UpdateProfileScreen extends StatelessWidget {
         keyboardType: theAgeTextField ? TextInputType.number : null,
         controller: controller, //assigned controller to a single text field
         decoration: InputDecoration(
-
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
-                color: isDarkModeEnabled ? Colors.white : Colors.white,
+                color: isDarkModeEnabled ? Colors.white : Colors.grey,
             ),
           ),
           hintText: title,

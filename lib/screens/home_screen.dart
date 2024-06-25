@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:crypto_app/App_Theme/app_theme.dart';
 import 'package:crypto_app/model/coin_details.dart';
-import 'package:crypto_app/screens/insta_screen.dart';
 import 'package:crypto_app/screens/update_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   //this is show the user details from profile on our drawer
   String username = "", email = "", age = "";
 
-  bool isDarkMode = false;
+  bool isDarkMode = AppTheme.isDarkModeEnabled;
 
   final GlobalKey <ScaffoldState> _globalKey = GlobalKey <ScaffoldState>();
 
@@ -42,7 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void getUserDetails() async { //to access the storage/to get the details
     SharedPreferences prefs = await
     SharedPreferences.getInstance();
-
   setState(() { // the setState lets us see the details in real time
     username = prefs.getString('username') ?? "";
     email = prefs.getString('email') ?? "";
@@ -83,7 +81,8 @@ class _HomeScreenState extends State<HomeScreen> {
           icon: Icon(Icons.menu, color: Colors.black,),
         ),
         title: const Text(
-          "Black Point Trade", style: TextStyle(color: Colors.black),
+          "Black Point Trade",
+          style: TextStyle(color: Colors.black),
         ),
       ),
       drawer: Drawer(
@@ -104,8 +103,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 ListTile(
                   onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=> 
-                        InstaScreen(),
+                    Navigator.push(
+                      context, MaterialPageRoute(
+                      builder: (context)=>
+                        UpdateProfileScreen(),
                         ),
                     );
                   },
@@ -122,10 +123,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () async {
                     SharedPreferences prefs = await
                     SharedPreferences.getInstance();
-                    await prefs.setBool('isDarkMode', isDarkMode);
+
                     setState(() {
                       isDarkMode = !isDarkMode;
                     });
+                    await prefs.setBool('isDarkMode', isDarkMode);
                     AppTheme.isDarkModeEnabled = isDarkMode;
                   },
                   leading: Icon(
@@ -168,7 +170,6 @@ class _HomeScreenState extends State<HomeScreen> {
           if (coinDetailsList.isEmpty){
             coinDetailsList = snapshot.data!;
           }
-
          return Column(
            children: [
              Padding(
@@ -188,9 +189,8 @@ class _HomeScreenState extends State<HomeScreen> {
                    setState(() {
                      coinDetailsList = searchResult;
                    });
-
                  },
-                 decoration: InputDecoration(
+                  decoration: InputDecoration(
                    prefixIcon: Icon(Icons.search_outlined),
                    border: OutlineInputBorder(
                      borderRadius: BorderRadius.circular(40),
