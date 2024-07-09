@@ -37,7 +37,8 @@ class UpdateProfileScreen extends StatelessWidget {
           customTextField("Enter Username", username, false, ),
           customTextField("Enter Email", email, false),
           //customTextField("Enter Age", age, true),
-          ElevatedButton(onPressed: (){
+          ElevatedButton(
+            onPressed: (){
             saveUserDetails();
             },
               child: Text("Update"),

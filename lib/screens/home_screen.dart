@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String url = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur';
   final String apiKey = 'CG-MmgBpYFtyosYswUtLquVUyP9';
 
-  List<CoinDetailsModel> coinDetailsList = [];
+  List<CoinDetailsModel> coinDetailsList = [];// to save a copy of the list from the snapshot
 
   late Future<List<CoinDetailsModel>>coinDetailsFuture;
 
@@ -55,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
       'accept': 'application/json',
       'x-cg-demo-api-key': apiKey
     });
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == 200 || response.statusCode == 201){
       List coinsData = json.decode (response.body);
       List<CoinDetailsModel> data = coinsData.map((e) =>
           CoinDetailsModel.fromJson(e)).toList();
@@ -123,7 +123,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () async {
                     SharedPreferences prefs = await
                     SharedPreferences.getInstance();
-
                     setState(() {
                       isDarkMode = !isDarkMode;
                     });
@@ -164,59 +163,46 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
       ),
       body: FutureBuilder(
-          future: coinDetailsFuture,
-          builder: (context, AsyncSnapshot<List<CoinDetailsModel>> snapshot){
-        if (snapshot.hasData) {
-          if (coinDetailsList.isEmpty){
-            coinDetailsList = snapshot.data!;
-          }
-         return Column(
-           children: [
-             Padding(
-               padding: const EdgeInsets.symmetric(
-                 vertical: 10,
-                 horizontal:20,
-               ),
-               child: TextField(
-                 onChanged: (query){
-                   List<CoinDetailsModel> searchResult =
-                   snapshot.data!.where((element){
-                     String coinName = element.name;
-                     bool isItemFound = coinName.contains(query);
-                     return isItemFound;
-                   }).toList();
-
-                   setState(() {
-                     coinDetailsList = searchResult;
-                   });
-                 },
-                  decoration: InputDecoration(
-                   prefixIcon: Icon(Icons.search_outlined),
-                   border: OutlineInputBorder(
-                     borderRadius: BorderRadius.circular(40),
-                   ),
-                   hintText: "Search for a coin",
-                 ),
-               ),
-             ),
-             Expanded(
-                 child: ListView.builder(
-               itemCount: coinDetailsList.length,
-               itemBuilder: (context, index){
-                 return coinDetails(coinDetailsList[index]);
-               },
-              ),
-             ),
-           ],
-         );
-        }else{
-          return Center(
-            child: CircularProgressIndicator(
-              color: Colors.deepPurple,
-            ),
-          );
-        }
-      }),
+        future: getCoinsDetails(),
+          builder: (context,
+              AsyncSnapshot<List<CoinDetailsModel>>snapshot){
+              if (snapshot.hasData){
+                return Column(
+                  children: [
+                    Padding(padding: EdgeInsets.symmetric(
+                      vertical: 15,
+                      horizontal: 20,
+                    ),
+                      child: TextField(
+                        onChanged: (query){
+                          print("query");
+                        },
+                        decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.search),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(40),
+                            ),
+                            hintText: "Search for a coin"
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                        child: ListView.builder(
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index){
+                            return coinDetails(snapshot.data![index]);
+                            },
+                        ),
+                    )
+                  ],
+                );
+              } else{
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            }
+          ),
     );
   }
   Widget coinDetails  (CoinDetailsModel model){
@@ -226,11 +212,13 @@ class _HomeScreenState extends State<HomeScreen> {
         leading: SizedBox(
           height: 50,
             width: 50,
-            child: Image.network(model.image)),
+            child: Image.network(model.image),
+          ),
         title: Text("${model.name}\n${model.symbol}",
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w500,
+              color: isDarkMode ? Colors.white : Colors.black
           ),
         ),
         trailing: RichText(
@@ -240,14 +228,15 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w500,
-                color: Colors.black,
+                  color: isDarkMode ? Colors.white : Colors.black
               ),
               children: [
                 TextSpan(
                   text: "${model.priceChangePercentage24h}%",
                   style: TextStyle(
                     fontSize: 17,
-                    fontWeight: FontWeight.w500, color: Colors.red,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.red,
                   )
                 ),
               ]
