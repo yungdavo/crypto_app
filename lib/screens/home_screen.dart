@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+import 'coin_graph_screen.dart';
+
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -163,19 +166,36 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
       ),
       body: FutureBuilder(
-        future: getCoinsDetails(),
+        future: coinDetailsFuture,
           builder: (context,
               AsyncSnapshot<List<CoinDetailsModel>>snapshot){
               if (snapshot.hasData){
+
+                if(coinDetailsList.isEmpty){
+                  coinDetailsList = snapshot.data!;
+                }
+
                 return Column(
                   children: [
-                    Padding(padding: EdgeInsets.symmetric(
+                    Padding(padding: const EdgeInsets.symmetric(
                       vertical: 15,
                       horizontal: 20,
                     ),
                       child: TextField(
                         onChanged: (query){
-                          print("query");
+                          List<CoinDetailsModel>searchResult =
+                          snapshot.data!.where((element){
+
+                            String coinName = element.name;
+
+                            bool isItemFound = coinName.contains(query);
+
+                            return isItemFound;
+                          }).toList();
+
+                          setState(() {
+                            coinDetailsList = searchResult;
+                          });
                         },
                         decoration: InputDecoration(
                             prefixIcon: Icon(Icons.search),
@@ -188,16 +208,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     Expanded(
                         child: ListView.builder(
-                          itemCount: snapshot.data!.length,
+                          itemCount: coinDetailsList.length,
                           itemBuilder: (context, index){
-                            return coinDetails(snapshot.data![index]);
+                            return coinDetails(coinDetailsList[index]);
                             },
                         ),
                     )
                   ],
                 );
               } else{
-                return Center(
+                return const Center(
                   child: CircularProgressIndicator(),
                 );
               }
@@ -209,6 +229,17 @@ class _HomeScreenState extends State<HomeScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: ListTile(
+        onTap: (){
+          Navigator.push(context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                  CoinGraphScreen(
+                    coinId: model.id,
+                    coinName: model.name,
+                  ),
+              ),
+          );
+        },
         leading: SizedBox(
           height: 50,
             width: 50,
